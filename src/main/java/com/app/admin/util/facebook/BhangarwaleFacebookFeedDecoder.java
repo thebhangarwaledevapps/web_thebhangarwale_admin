@@ -1,4 +1,4 @@
-package com.app.admin.util;
+package com.app.admin.util.facebook;
 
 import com.app.admin.entity.BhangarwaleFacebookFeed;
 import com.app.admin.entity.BhangarwaleFacebookPosts;
@@ -17,7 +17,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
-public class BhangarwaleFacebookAfterFirstFeedDecoder implements Decoder {
+public class BhangarwaleFacebookFeedDecoder implements Decoder {
 
     @Override
     public Object decode(Response response, Type type) throws IOException, DecodeException, FeignException {
@@ -30,7 +30,7 @@ public class BhangarwaleFacebookAfterFirstFeedDecoder implements Decoder {
                 responseStrBuilder.append(line);
             }
             inputStream.close();
-            JSONObject result = new JSONObject(responseStrBuilder.toString());
+            JSONObject result = new JSONObject(responseStrBuilder.toString()).getJSONObject("posts");
             String nextPageToken = null;
             BhangarwaleFacebookFeed bhangarwaleFacebookFeed = new BhangarwaleFacebookFeed();
             if(result.has("paging")) {

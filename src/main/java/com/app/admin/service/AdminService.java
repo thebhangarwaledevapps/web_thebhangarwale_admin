@@ -1,14 +1,19 @@
 package com.app.admin.service;
 
+import com.app.admin.entity.BhangarTypeAndPrice;
+import com.app.admin.entity.BhangarwaleFacebookFeed;
 import com.app.admin.exception.*;
 import com.app.admin.repository.Repository;
 import com.app.admin.result.ClientError;
 import com.app.admin.result.Result;
 import com.app.admin.result.ServerError;
 import com.app.admin.result.Success;
+import com.app.admin.util.internationalization.Translator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 @Service
 public class AdminService {
@@ -16,47 +21,47 @@ public class AdminService {
     @Autowired
     private Repository repositoryImpl;
 
+    @Autowired
+    private Translator translator;
+
     public Result getBhangarwaleFacebookFeed(String nextPageAccessToken) {
-        return repositoryImpl
-                .getBhangarwaleFacebookFeed(nextPageAccessToken);
+        return repositoryImpl.getBhangarwaleFacebookFeed(nextPageAccessToken)
+                .map((Function<BhangarwaleFacebookFeed, Result<BhangarwaleFacebookFeed>>) Success::new)
+                .orElse(new ServerError(null));
     }
 
     public Result saveBhangarTypeAndPrice(String bhangarType, String bhangarUnit, Double bhangarPrice) {
+        Result result = null;
         try {
             if (bhangarType == null || bhangarType.isEmpty())
-                throw new InvalidBhangarTypeException();
+                throw new InvalidBhangarTypeException(translator.toLocale("error_valid_bhangar_type"));
             if (bhangarUnit == null || bhangarUnit.isEmpty())
-                throw new InvalidBhangarUnitException();
+                throw new InvalidBhangarUnitException(translator.toLocale("error_valid_bhangar_unit"));
             if (bhangarPrice <= 0)
-                throw new InvalidBhangarPriceException();
-            return Optional.ofNullable(
-                    repositoryImpl
-                            .saveBhangarTypeAndPrice(getCapitalizeWord(bhangarType), bhangarUnit, bhangarPrice)
-            ).map(bhangarTypeAndPrice -> new Success("Data Saved Successfully.")
-            ).get();
-        } catch (InvalidBhangarTypeException e) {
-            return new ClientError(e.getMessage());
-        } catch (InvalidBhangarUnitException e) {
-            return new ClientError(e.getMessage());
-        } catch (InvalidBhangarPriceException e) {
-            return new ClientError(e.getMessage());
+                throw new InvalidBhangarPriceException(translator.toLocale("error_valid_bhangar_price"));
+            result = Optional.ofNullable(repositoryImpl.saveBhangarTypeAndPrice(
+                    getCapitalizeWord(bhangarType),
+                    bhangarUnit,
+                    bhangarPrice
+            )).map((Function<BhangarTypeAndPrice, Result<String>>) bhangarTypeAndPrice -> new Success<>(
+                    translator.toLocale("success_bhangar_save"))
+            ).orElse(new ServerError(new Exception(translator.toLocale("error_something_went_wrong"))));
+        } catch (InvalidBhangarTypeException | InvalidBhangarUnitException | InvalidBhangarPriceException e) {
+            result = new ClientError(e);
         }
+        return result;
     }
 
     public Result getBhangarList() {
-        try {
-            return repositoryImpl.getBhangarList();
-        } catch (NoBhangarFoundException e){
-            return new ServerError(e.getMessage());
-        }
+        return repositoryImpl.getBhangarList()
+                .map((Function<List<BhangarTypeAndPrice>, Result<List<BhangarTypeAndPrice>>>) Success::new)
+                .orElse(new ServerError(new Exception(translator.toLocale("error_no_bhangar_found"))));
     }
 
     public Result getBhangarItemInfo(Long itemId) {
-        try {
-            return repositoryImpl.getBhangarItemInfo(itemId);
-        } catch (InvalidBhangarItemIdException e) {
-            return new ClientError(e.getMessage());
-        }
+        return repositoryImpl.getBhangarItemInfo(itemId)
+                .map((Function<BhangarTypeAndPrice, Result<BhangarTypeAndPrice>>) Success::new)
+                .orElse(new ClientError(new InvalidBhangarItemIdException(translator.toLocale("error_valid_bhangar_id"))));
     }
 
     String getCapitalizeWord(String bhangarType) {
@@ -72,5 +77,39 @@ public class AdminService {
         } catch (Exception exception) {
             return bhangarType;
         }
+    }
+
+    public boolean validatedAdminId(String adminId) {
+        return repositoryImpl.validatedAdminId(adminId);
+    }
+
+    public Result updateBhangarTypeAndPrice(Long bhangarId, String bhangarType, String bhangarUnit, Double bhangarPrice) {
+        Result result = null;
+        try {
+            if (bhangarType == null || bhangarType.isEmpty())
+                throw new InvalidBhangarTypeException(translator.toLocale("error_valid_bhangar_type"));
+            if (bhangarUnit == null || bhangarUnit.isEmpty())
+                throw new InvalidBhangarUnitException(translator.toLocale("error_valid_bhangar_unit"));
+            if (bhangarPrice <= 0)
+                throw new InvalidBhangarPriceException(translator.toLocale("error_valid_bhangar_price"));
+            result = Optional.ofNullable(repositoryImpl.updateBhangarTypeAndPrice(
+                    bhangarId,
+                    getCapitalizeWord(bhangarType),
+                    bhangarUnit,
+                    bhangarPrice
+            )).map((Function<BhangarTypeAndPrice, Result<String>>) bhangarTypeAndPrice -> new Success<>(
+                    translator.toLocale("success_bhangar_update"))
+            ).orElse(new ServerError(new Exception(translator.toLocale("error_something_went_wrong"))));
+        } catch (InvalidBhangarTypeException | InvalidBhangarUnitException | InvalidBhangarPriceException e) {
+            result = new ClientError(e);
+        }
+        return result;
+    }
+
+    public Result deleteBhangarTypeAndPrice(Long bhangarId){
+        return Optional.ofNullable(repositoryImpl.deleteById(bhangarId))
+                .map((Function<Long, Result<String>>) aLong -> new Success<>(
+                        translator.toLocale("success_bhangar_delete")))
+                .orElse(new ServerError(new Exception(translator.toLocale("error_something_went_wrong"))));
     }
 }

@@ -2,14 +2,15 @@ package com.app.admin.result;
 
 public final class ServerError extends Result {
 
-	final String errorMessage;
+	private final Exception exception;
 
-	public ServerError(String errorMessage) {
-		this.errorMessage = errorMessage;
+	public ServerError(Exception exception) {
+		super();
+		this.exception = exception;
 	}
 
-	public String getErrorMessage() {
-		return errorMessage;
+	public Exception getException() {
+		return exception;
 	}
 }
 

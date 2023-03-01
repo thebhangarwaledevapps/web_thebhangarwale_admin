@@ -1,9 +1,8 @@
 package com.app.admin.exception;
 
-public class InvalidBhangarUnitException extends Exception {
+public class InvalidBhangarUnitException extends RuntimeException {
 
-    @Override
-    public String getMessage() {
-        return "Enter Valid Bhangar Unit.";
+    public InvalidBhangarUnitException(String message) {
+        super(message);
     }
 }

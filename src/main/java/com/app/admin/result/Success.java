@@ -1,15 +1,15 @@
 package com.app.admin.result;
 
-public final class Success<D> extends Result {
+public final class Success<T> extends Result<T> {
 
-	final D data;
+	private final T data;
 
-	public Success(D data) {
+	public Success(T data) {
 		super();
 		this.data = data;
 	}
 
-	public D getData() {
+	public T getData() {
 		return data;
 	}
 	

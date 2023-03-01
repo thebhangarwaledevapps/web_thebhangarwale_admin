@@ -7,7 +7,7 @@ public class BhangarTypeAndPrice {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private Long bhangarId;
 
     @Column(nullable = false)
     private String bhangarType;
@@ -28,8 +28,8 @@ public class BhangarTypeAndPrice {
         this.bhangarPrice = bhangarPrice;
     }
 
-    public Long getId() {
-        return id;
+    public Long getBhangarId() {
+        return bhangarId;
     }
 
     public String getBhangarType() {

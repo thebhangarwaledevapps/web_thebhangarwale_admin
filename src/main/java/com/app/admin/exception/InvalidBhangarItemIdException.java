@@ -1,10 +1,8 @@
 package com.app.admin.exception;
 
-public class InvalidBhangarItemIdException extends Exception {
+public class InvalidBhangarItemIdException extends RuntimeException {
 
-    @Override
-    public String getMessage() {
-        return "Enter Valid Bhangar Item Id.";
+    public InvalidBhangarItemIdException(String message) {
+        super(message);
     }
-
 }

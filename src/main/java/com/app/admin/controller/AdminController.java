@@ -1,6 +1,5 @@
 package com.app.admin.controller;
 
-import com.app.admin.entity.BhangarTypeAndPrice;
 import com.app.admin.result.ClientError;
 import com.app.admin.result.Result;
 import com.app.admin.result.ServerError;
@@ -48,40 +47,60 @@ public class AdminController {
     }
 
     @GetMapping("/getBhangarItemInfo")
-    public ResponseEntity<BhangarTypeAndPrice> getBhangarItemInfo(
+    public ResponseEntity<Result> getBhangarItemInfo(
             @RequestParam Long itemId
     ) {
-        return getMicroServiceResultResponseEntity(
+        return getResultResponseEntity(
                 adminService.getBhangarItemInfo(
                         itemId
                 )
         );
     }
 
-    private ResponseEntity<Result> getResultResponseEntity(Result result) {
-        if (result instanceof Success) {
-            Success success = (Success) result;
-            return ResponseEntity.ok(success);
-        } else if (result instanceof ClientError) {
-            ClientError clientError = (ClientError) result;
-            return ResponseEntity.badRequest().body(clientError);
-        } else if (result instanceof ServerError) {
-            ServerError serverError = (ServerError) result;
-            return ResponseEntity.internalServerError().body(serverError);
-        } else return null;
+    @GetMapping("/validatedAdminId")
+    public ResponseEntity validatedCustomerId(
+            @RequestParam String adminId
+    ) {
+        return ResponseEntity.ok(adminService.validatedAdminId(adminId));
     }
 
-    private ResponseEntity getMicroServiceResultResponseEntity(Result result) {
+    @GetMapping("/updateBhangarTypeAndPrice")
+    public ResponseEntity<Result> updateBhangarTypeAndPrice(
+            @RequestParam Long bhangarId,
+            @RequestParam String bhangarType,
+            @RequestParam String bhangarUnit,
+            @RequestParam Double bhangarPrice
+    ) {
+        return getResultResponseEntity(adminService.updateBhangarTypeAndPrice(
+                bhangarId,
+                bhangarType,
+                bhangarUnit,
+                bhangarPrice
+        ));
+    }
+
+    @GetMapping("/deleteBhangarTypeAndPrice")
+    public ResponseEntity<Result> deleteBhangarTypeAndPrice(
+            @RequestParam Long bhangarId
+    ) {
+        return getResultResponseEntity(adminService.deleteBhangarTypeAndPrice(
+                bhangarId
+        ));
+    }
+
+    private ResponseEntity getResultResponseEntity(Result result) {
+        ResponseEntity responseEntity = null;
         if (result instanceof Success) {
             Success success = (Success) result;
-            return ResponseEntity.ok(success.getData());
+            responseEntity = ResponseEntity.ok(success.getData());
         } else if (result instanceof ClientError) {
             ClientError clientError = (ClientError) result;
-            return ResponseEntity.badRequest().body(clientError.getErrorMessage());
+            responseEntity = ResponseEntity.badRequest().body(clientError.getException().getMessage());
         } else if (result instanceof ServerError) {
             ServerError serverError = (ServerError) result;
-            return ResponseEntity.internalServerError().body(serverError.getErrorMessage());
-        } else return null;
+            responseEntity = ResponseEntity.internalServerError().body(serverError.getException().getMessage());
+        }
+        return responseEntity;
     }
 
 }

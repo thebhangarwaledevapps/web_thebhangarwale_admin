@@ -1,9 +1,8 @@
 package com.app.admin.exception;
 
-public class InvalidBhangarTypeException extends Exception {
+public class InvalidBhangarTypeException extends RuntimeException {
 
-    @Override
-    public String getMessage() {
-        return "Enter Valid Bhangar Type.";
+    public InvalidBhangarTypeException(String message) {
+        super(message);
     }
 }

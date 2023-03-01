@@ -1,4 +1,4 @@
-package com.app.admin.util;
+package com.app.admin.util.facebook;
 
 import com.app.admin.entity.BhangarwaleFacebookPageDetail;
 import feign.FeignException;

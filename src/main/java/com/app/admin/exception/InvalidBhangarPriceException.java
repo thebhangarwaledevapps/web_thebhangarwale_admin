@@ -1,9 +1,8 @@
 package com.app.admin.exception;
 
-public class InvalidBhangarPriceException extends Exception {
+public class InvalidBhangarPriceException extends RuntimeException {
 
-    @Override
-    public String getMessage() {
-        return "Enter Valid Bhangar Price.";
+    public InvalidBhangarPriceException(String message) {
+        super(message);
     }
 }
